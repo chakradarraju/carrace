@@ -1,0 +1,26 @@
+<html>
+<head>
+<script src="fabric.js"></script>
+<style>
+.lower-canvas {
+  position: absolute;
+  border: black 2px solid;
+  top: 50%;
+  left: 50%;
+  width: 640px;
+  height: 500px;
+  margin-top: -250px;
+  margin-left: -320px;
+}
+</style>
+</head>
+<body>
+<div style='text-align:center'>
+  Score: <span id='score'></span>
+  Level: <span id='level'></span>
+  <div id='restart' style='display:none'>Press Enter to restart</div>
+</div>
+<canvas id='canvas'></canvas>
+<script src='script.js'></script>
+</body>
+</html>
