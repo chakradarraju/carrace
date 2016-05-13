@@ -43,18 +43,32 @@ Display.prototype.width = function() {
 };
 
 Display.prototype.show = function(x, y) {
-  if (x < 0 || x >= this.width() || y < 0 || y >= this.height()) return;
-  this.pixels_[x][y].visible = true;
+  this.setVisible(x, y, true);
 };
 
 Display.prototype.hide = function(x, y) {
+  this.setVisible(x, y, false);
+};
+
+Display.prototype.setVisible = function(x, y, visible) {
   if (x < 0 || x >= this.width() || y < 0 || y >= this.height()) return;
-  this.pixels_[x][y].visible = false;
+  this.pixels_[x][y].visible = visible;
+};
+
+Display.prototype.isVisible = function(x, y) {
+  if (x < 0 || x >= this.width() || y < 0 || y >= this.height()) return;
+  return this.pixels_[x][y].visible;
 };
 
 Display.prototype.showPixels = function(points) {
   for (var i = 0; i < points.length; i++) {
     this.show(points[i][0], points[i][1]);
+  }
+};
+
+Display.prototype.hidePixels = function(points) {
+  for (var i = 0; i < points.length; i++) {
+    this.hide(points[i][0], points[i][1]);
   }
 };
 

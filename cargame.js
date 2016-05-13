@@ -8,34 +8,16 @@ RIGHT = 1;
 LEFT_KEY = 37;
 RIGHT_KEY = 39;
 UP_KEY = 38;
-ENTER_KEY = 13;
 
 function CarGame(display, input, endCallback) {
   this.display_ = display;
   this.input_ = input;
   this.endCallback_ = endCallback;
 
-  // Setup cars
-  this.playerCar_ = new Car(ROAD_LEFT + 1, this.display_.height() - Car.HEIGHT - 1);
-  this.otherCars_ = [];
-  this.otherCars_.push(this.newCar_());
-
   this.setupInputHandler_();
-
-  this.nitro_ = false;
-  this.currentSpeed_ = 2;
-  this.score_ = 0;
-  this.resetSpeed_(2);
-  this.display_.updateLevel(1);
-  this.display_.updateScore(0);
-  var self = this;
-  this.speedTicker_ = setInterval(function() {
-    level.innerText = self.currentSpeed_++;
-    self.resetSpeed_(self.currentSpeed_);
-  }, 5000);
-  this.scoreTicker_ = setInterval(function() {
-    score.innerText = self.getScore();
-  }, 500);
+  this.setupCars_();
+  this.setupSpeed_();
+  this.setupScore_();
 }
 
 CarGame.prototype.setupInputHandler_ = function() {
@@ -54,11 +36,54 @@ CarGame.prototype.movePlayerRight_ = function() {
 };
 
 CarGame.prototype.movePlayer_ = function(direction) {
-  this.playerCar_.move(direction, 0);
-  this.render_();
+  this.moveCar_(this.playerCar_, direction, 0);
+  this.display_.render();
   if (this.checkPlayerCollision_()) {
     this.endGame_();
   }
+};
+
+CarGame.prototype.moveCar_ = function(car, x, y) {
+  this.display_.hidePixels(car.getPixels(), x, y);
+  car.move(x, y);
+  this.display_.showPixels(car.getPixels(), x, y);
+};
+
+CarGame.prototype.setupCars_ = function() {
+  CarGame.drawRoads(this.display_);
+  this.playerCar_ = new Car(ROAD_LEFT + 1, this.display_.height() - Car.HEIGHT - 1);
+  this.display_.showPixels(this.playerCar_.getPixels());
+  this.otherCars_ = [];
+  this.otherCars_.push(CarGame.newCar());
+};
+
+CarGame.prototype.setupSpeed_ = function() {
+  this.nitro_ = false;
+  this.setLevel_(1);
+  this.speedTicker_ = setInterval(function() {
+    this.setLevel_(this.getLevel() + 1);
+  }.bind(this), 5000);
+};
+
+CarGame.prototype.getLevel = function() {
+  return this.level_;
+};
+
+CarGame.prototype.setLevel_ = function(level) {
+  this.level_ = level;
+  this.display_.updateLevel(level);
+  if (this.ticker_) {
+    clearInterval(this.ticker_);
+  }
+  this.ticker_ = setInterval(this.tick_.bind(this), Math.ceil(600 / (level + 1)));
+};
+
+CarGame.prototype.setupScore_ = function() {
+  this.score_ = 0;
+  this.display_.updateScore(0);
+  this.scoreTicker_ = setInterval(function() {
+    score.innerText = this.getScore();
+  }.bind(this), 500);
 };
 
 CarGame.prototype.activateNitro_ = function() {
@@ -69,19 +94,6 @@ CarGame.prototype.deactivateNitro_ = function() {
   this.nitro_ = false;
 };
 
-CarGame.prototype.resetSpeed_ = function(speed) {
-  if (this.ticker_) {
-    clearInterval(this.ticker_);
-  }
-  this.ticker_ = setInterval(this.tick_.bind(this), Math.ceil(600 / speed));
-};
-
-
-CarGame.prototype.newCar_ = function() {
-  var left = ROAD_LEFT + 1 + Car.WIDTH * Math.floor(Math.random() * ROAD_LANES);
-  return new Car(left, 1 - Car.HEIGHT);
-};
-
 CarGame.prototype.shouldAddAnotherCar_ = function() {
   return Math.random() < 0.1;
 };
@@ -90,18 +102,18 @@ CarGame.prototype.tick_ = function() {
   var displacement = this.nitro_ ? 2 * DOWN : DOWN;
   this.score_ += displacement;
   this.otherCars_.forEach(function(car) {
-    car.move(0, displacement);
-  });
+    this.moveCar_(car, 0, displacement);
+  }.bind(this));
   if (this.otherCars_.length > 0 && this.otherCars_[0].y() > this.display_.height()) {
     this.otherCars_.shift();
   }
   if (this.shouldAddAnotherCar_()) {
-    var car = this.newCar_();
+    var car = CarGame.newCar();
     if (!this.checkCollision_(car, this.otherCars_)) {
       this.otherCars_.push(car);
     }
   }
-  this.render_();
+  this.display_.render();
   if (this.checkPlayerCollision_()) {
     this.endGame_();
   }
@@ -116,11 +128,10 @@ CarGame.prototype.checkPlayerCollision_ = function() {
 };
 
 CarGame.prototype.checkCollision_ = function(car, cars) {
-  var self = this;
   var occupied = {};
   var encode = function(pixel) {
-    return pixel[0] * self.display_.width() + pixel[1];
-  };
+    return pixel[0] * this.display_.width() + pixel[1];
+  }.bind(this);
   car.getPixels().forEach(function(pixel) {
     occupied[encode(pixel)] = true;
   });
@@ -134,26 +145,6 @@ CarGame.prototype.checkCollision_ = function(car, cars) {
   });
 };
 
-CarGame.prototype.render_ = function() {
-  this.display_.reset();
-  // Draw road
-  for (var i = 0; i < this.display_.height(); i++) {
-    this.display_.show(ROAD_LEFT, i);
-    this.display_.show(ROAD_LEFT + Car.WIDTH * ROAD_LANES + 1, i);
-  }
-
-  this.display_.showPixels(this.playerCar_.getPixels());
-
-  var self = this;
-  this.otherCars_.forEach(function(car) {
-    self.display_.showPixels(car.getPixels());
-  });
-
-  if (this.gameOver_) {
-  }
-  this.display_.render();
-};
-
 CarGame.prototype.getScore = function() {
   return this.score_;
 };
@@ -164,6 +155,29 @@ CarGame.prototype.endGame_ = function() {
   clearInterval(this.scoreTicker_);
   this.input_.reset();
   this.endCallback_();
+};
+
+CarGame.drawRoads = function(display) {
+  for (var i = 0; i < display.height(); i++) {
+    display.show(ROAD_LEFT, i);
+    display.show(ROAD_LEFT + Car.WIDTH * ROAD_LANES + 1, i);
+  }
+};
+
+CarGame.newCar = function() {
+  var left = ROAD_LEFT + 1 + Car.WIDTH * Math.floor(Math.random() * ROAD_LANES);
+  return new Car(left, 1 - Car.HEIGHT);
+};
+
+CarGame.showPreview = function(display) {
+  display.reset();
+  CarGame.drawRoads(display);
+  for (var i = 0; i < display.height() / 10; i++) {
+    var car = CarGame.newCar();
+    car.move(0, DOWN * 10 * i);
+    display.showPixels(car.getPixels());
+  }
+  display.render();
 };
 
 function Car(x, y) {

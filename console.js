@@ -1,22 +1,29 @@
-function Console() {
-  this.restartGame_();
-}
+ENTER_KEY = 13;
 
-Console.prototype.restartGame_ = function() {
+function Console() {
   this.display_ = new Display();
   this.input_ = new Input();
-  this.game_ = new CarGame(this.display_, this.input_, this.onGameOver_.bind(this));
+  this.showMenu_();
+}
+
+Console.prototype.showMenu_ = function() {
+  var menu = new Menu(this.display_, this.input_, this.startGame_.bind(this));
+};
+
+Console.prototype.startGame_ = function(game) {
+  this.display_.reset();
+  this.input_.reset();
+  this.game_ = new game(this.display_, this.input_, this.onGameOver_.bind(this));
 };
 
 Console.prototype.onGameOver_ = function() {
   this.showGameOver_();
   var restart = document.getElementById('restart');
-  var self = this;
   restart.style.display = '';
   this.input_.listenPress(ENTER_KEY, function() {
     restart.style.display = 'none';
-    self.restartGame_();
-  });
+    this.showMenu_();
+  }.bind(this));
 };
 
 Console.prototype.showGameOver_ = function() {
