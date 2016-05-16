@@ -1,8 +1,8 @@
 LEFT = -1;
 RIGHT = 1;
 
-LEFT_WALL = 5;
-RIGHT_WALL = 20;
+LEFT_WALL = 0;
+RIGHT_WALL = 11;
 
 LEFT_KEY = 37;
 RIGHT_KEY = 39;
@@ -56,7 +56,7 @@ Tetris.prototype.setupSpeed_ = function() {
   this.setLevel_(1);
   this.speedTicker_ = setInterval(function() {
     this.setLevel_(this.getLevel() + 1);
-  }.bind(this), 30000);
+  }.bind(this), 120000);
 };
 
 Tetris.prototype.getLevel = function() {
@@ -65,7 +65,7 @@ Tetris.prototype.getLevel = function() {
 
 Tetris.prototype.setLevel_ = function(level) {
   this.level_ = level;
-  this.display_.updateLevel(level);
+  this.display_.setLevel(level);
   if (this.ticker_) {
     clearInterval(this.ticker_);
   }
@@ -74,7 +74,7 @@ Tetris.prototype.setLevel_ = function(level) {
 
 Tetris.prototype.setupScore_ = function() {
   this.score_ = 0;
-  this.display_.updateScore(0);
+  this.display_.setScore(0);
 };
 
 Tetris.prototype.getScore = function() {
@@ -117,7 +117,7 @@ Tetris.prototype.cleanupFullLines_ = function() {
       this.display_.hide(x, y);
     }
   }
-  this.display_.updateScore(this.getScore());
+  this.display_.setScore(this.getScore());
 };
 
 Tetris.prototype.isLineFull_ = function(y) {
@@ -183,7 +183,7 @@ Tetris.prototype.isEmpty_ = function(pixels) {
 
 Tetris.prototype.reachedTop_ = function(block) {
   return block.getPixels().some(function(pixel) {
-    return pixel[1] == 1;
+    return pixel[1] == 0;
   });
 };
 
@@ -210,7 +210,7 @@ Tetris.drawWalls = function(display) {
 };
 
 Tetris.showPreview = function(display) {
-  display.reset();
+  display.clearArena();
   Tetris.drawWalls(display);
   for (var i = 0; i < display.height() / 10; i++) {
     var block = Tetris.generateNewBlock();

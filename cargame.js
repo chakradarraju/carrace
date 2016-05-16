@@ -1,5 +1,5 @@
-ROAD_LEFT = 5;
-ROAD_LANES = 5;
+ROAD_LEFT = 1;
+ROAD_LANES = 3;
 
 DOWN = 1;
 LEFT = -1;
@@ -71,7 +71,7 @@ CarGame.prototype.getLevel = function() {
 
 CarGame.prototype.setLevel_ = function(level) {
   this.level_ = level;
-  this.display_.updateLevel(level);
+  this.display_.setLevel(level);
   if (this.ticker_) {
     clearInterval(this.ticker_);
   }
@@ -80,9 +80,9 @@ CarGame.prototype.setLevel_ = function(level) {
 
 CarGame.prototype.setupScore_ = function() {
   this.score_ = 0;
-  this.display_.updateScore(0);
+  this.display_.setScore(0);
   this.scoreTicker_ = setInterval(function() {
-    score.innerText = this.getScore();
+    this.display_.setScore(this.getScore());
   }.bind(this), 500);
 };
 
@@ -130,7 +130,7 @@ CarGame.prototype.checkPlayerCollision_ = function() {
 CarGame.prototype.checkCollision_ = function(car, cars) {
   var occupied = {};
   var encode = function(pixel) {
-    return pixel[0] * this.display_.width() + pixel[1];
+    return pixel[1] * this.display_.width() + pixel[0];
   }.bind(this);
   car.getPixels().forEach(function(pixel) {
     occupied[encode(pixel)] = true;
@@ -170,7 +170,7 @@ CarGame.newCar = function() {
 };
 
 CarGame.showPreview = function(display) {
-  display.reset();
+  display.clearArena();
   CarGame.drawRoads(display);
   for (var i = 0; i < display.height() / 10; i++) {
     var car = CarGame.newCar();

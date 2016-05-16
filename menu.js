@@ -9,6 +9,7 @@ function Menu(display, input, startCallback) {
   this.showPreview_();
 
   this.setupInputHandlers_();
+  this.display_.setMessage('Use Left/Right to browse games and Enter to start game.');
 }
 
 Menu.prototype.setupInputHandlers_ = function() {
