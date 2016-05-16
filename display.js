@@ -79,12 +79,12 @@ Display.prototype.hide = function(x, y) {
 
 Display.prototype.setVisible = function(x, y, visible) {
   if (x < 0 || x >= this.width() || y < 0 || y >= this.height()) return;
-  this.pixels_[x][y].visible = visible;
+  this.pixels_[x][y].opacity = visible ? 1.0 : 0.01;
 };
 
 Display.prototype.isVisible = function(x, y) {
   if (x < 0 || x >= this.width() || y < 0 || y >= this.height()) return;
-  return this.pixels_[x][y].visible;
+  return this.pixels_[x][y].opacity > 0.2;
 };
 
 Display.prototype.showPixels = function(points) {
@@ -109,7 +109,7 @@ Display.prototype.reset = function() {
 Display.prototype.clearArena = function() {
   for (var i = 0; i < this.width(); i++) {
     for (var j = 0; j < this.height(); j++) {
-      this.pixels_[i][j].visible = false;
+      this.hide(i, j);
     }
   }
 };
