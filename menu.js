@@ -1,4 +1,3 @@
-
 GAMES = [CarGame, Tetris];
 
 function Menu(display, input, startCallback) {

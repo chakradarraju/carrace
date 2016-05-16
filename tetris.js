@@ -4,11 +4,6 @@ RIGHT = 1;
 LEFT_WALL = 0;
 RIGHT_WALL = 11;
 
-LEFT_KEY = 37;
-RIGHT_KEY = 39;
-DOWN_KEY = 40;
-UP_KEY = 38;
-
 function Tetris(display, input, endCallback) {
   this.display_ = display;
   this.input_ = input;
@@ -25,6 +20,7 @@ Tetris.prototype.setupInputHandlers_ = function() {
   this.input_.listenPress(RIGHT_KEY, this.moveRight_.bind(this));
   this.input_.listenPress(DOWN_KEY, this.putDown_.bind(this));
   this.input_.listenPress(UP_KEY, this.rotate_.bind(this));
+  this.input_.listenPress(ENTER_KEY, this.rotate_.bind(this));
 };
 
 Tetris.prototype.moveLeft_ = function() {

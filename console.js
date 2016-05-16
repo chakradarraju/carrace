@@ -1,9 +1,14 @@
-ENTER_KEY = 13;
+WIDTH = 300;
 
 function Console() {
-  this.display_ = new Display(document.getElementById('display'));
+  var display = document.getElementById('display');
+  var controls = document.getElementById('controls');
+  this.display_ = new Display(display);
   this.input_ = new Input();
+  this.input_.showControls(controls);
   this.showMenu_();
+  display.style.width = WIDTH;
+  controls.style.width = WIDTH;
 }
 
 Console.prototype.showMenu_ = function() {

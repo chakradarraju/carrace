@@ -5,10 +5,6 @@ DOWN = 1;
 LEFT = -1;
 RIGHT = 1;
 
-LEFT_KEY = 37;
-RIGHT_KEY = 39;
-UP_KEY = 38;
-
 function CarGame(display, input, endCallback) {
   this.display_ = display;
   this.input_ = input;
@@ -25,6 +21,8 @@ CarGame.prototype.setupInputHandler_ = function() {
   this.input_.listenPress(RIGHT_KEY, this.movePlayerRight_.bind(this));
   this.input_.listenPress(UP_KEY, this.activateNitro_.bind(this));
   this.input_.listenRelease(UP_KEY, this.deactivateNitro_.bind(this));
+  this.input_.listenPress(ENTER_KEY, this.activateNitro_.bind(this));
+  this.input_.listenRelease(ENTER_KEY, this.deactivateNitro_.bind(this));
 };
 
 CarGame.prototype.movePlayerLeft_ = function() {

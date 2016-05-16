@@ -1,7 +1,5 @@
 ARENA_WIDTH = 12;
 ARENA_HEIGHT = 30;
-DISPLAY_WIDTH = 300;
-DISPLAY_HEIGHT = 500;
 PIXEL_SIZE = 10;
 
 FOREGROUND_COLOR = 'black';
@@ -9,15 +7,9 @@ BACKGROUND_COLOR = 'white';
 
 function Display(el) {
   this.el_ = el;
-  this.initEl_();
   this.initArena_();
   this.initOutputs_();
   this.reset();
-}
-
-Display.prototype.initEl_ = function() {
-  this.el_.style.width = DISPLAY_WIDTH;
-  this.el_.style.height = DISPLAY_HEIGHT;
 }
 
 Display.prototype.initArena_ = function() {
